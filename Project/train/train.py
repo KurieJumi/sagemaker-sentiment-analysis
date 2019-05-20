@@ -68,7 +68,36 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
     """
     
     # TODO: Paste the train() method developed in the notebook here.
-
+    for epoch in range(1, epochs + 1):
+        model.train()
+        total_loss = 0
+        for batch in train_loader:         
+            batch_X, batch_y = batch
+            
+            batch_X = batch_X.to(device)
+            batch_y = batch_y.to(device)
+            
+            # Reference : https://pytorch.org/docs/stable/optim.html 
+            # After the model trains forward, we must set the zero gradient before calling backward
+            optimizer.zero_grad()
+            
+            # Compute the predicted value by passing batch_X to model
+            output = model(batch_X)
+            
+            # Compute the loss by passing output of predicted values by the model and 
+            # batch_y which is the actual values
+            loss = loss_fn(output,batch_y)
+            
+            # Reference : https://discuss.pytorch.org/t/what-does-the-backward-function-do/9944
+            # Compute the dloss/dx of every x and sum to gradient of x 
+            loss.backward()
+            
+            # Update the value of x with gradient of x calculated
+            optimizer.step()
+            
+            
+            total_loss += loss.data.item()
+        print("Epoch: {}, BCELoss: {}".format(epoch, total_loss / len(train_loader)))
     pass
 
 
